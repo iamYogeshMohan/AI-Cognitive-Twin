@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Cognitive Twin System</title>
+  <meta name="description" content="Sign in to your Cognitive Twin — your AI-powered mental model." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="auth-bg">
+  <div class="auth-card">
+
+    <div class="brand">
+      <div class="brand-icon">🧠</div>
+      <span class="brand-name">Cognitive Twin</span>
+      <span class="brand-badge">BETA</span>
+    </div>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub">Sign in to your cognitive workspace</p>
+
+    <div id="alert" class="alert"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input id="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+      <button id="login-btn" type="submit" class="btn btn-primary" style="margin-top:8px">
+        Sign In
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      New here? <a href="/signup">Create an account</a>
+    </p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Redirect if already logged in
+  if (getToken()) window.location.href = '/dashboard'
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const email    = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value
+
+    setLoading('login-btn', true, 'Sign In')
+    const { ok, data } = await api('POST', '/auth/login', { email, password })
+    setLoading('login-btn', false, 'Sign In')
+
+    if (!ok) return showAlert('alert', data.message || 'Login failed')
+
+    setToken(data.token)
+    setUser(data.user)
+
+    // Route based on onboarding status. If done, go to React App!
+    window.location.href = data.user.onboardingCompleted ? 'http://localhost:5173' : '/onboarding'
+  })
+</script>
+</body>
+</html>

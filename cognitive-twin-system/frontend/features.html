@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Features — Cognitive Twin System</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="features-bg">
+
+  <!-- Features Sidebar -->
+  <aside class="features-sidebar">
+    <div class="brand">
+      <div class="brand-icon">🧠</div>
+      <span class="brand-name" style="font-size:15px">CognitiveTwin</span>
+    </div>
+
+    <div id="feature-nav"></div>
+
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border)">
+      <a href="/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);transition:all 0.2s"
+         onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </aside>
+
+  <!-- Feature Content -->
+  <main class="features-main">
+    <div id="features-container"></div>
+  </main>
+
+</div>
+
+<script src="script.js"></script>
+<script>
+  if (!requireAuth()) {}
+
+  let features    = []
+  let currentIdx  = 0
+
+  // ── Load features from API ────────────────────
+  async function loadFeatures() {
+    const { ok, data } = await api('GET', '/features', null, true)
+    if (!ok) { window.location.href = '/dashboard'; return }
+    features = data.features
+    renderNav()
+    renderScreens()
+    showFeature(0)
+  }
+
+  // ── Build sidebar nav ─────────────────────────
+  function renderNav() {
+    const nav = document.getElementById('feature-nav')
+    nav.innerHTML = features.map((f, i) =>
+      `<div class="feature-nav-item" id="nav-${i}" onclick="showFeature(${i})">
+         <div class="feat-num">${f.id}</div>
+         <span class="feat-nav-title">${f.title}</span>
+       </div>`
+    ).join('')
+  }
+
+  // ── Build all feature screens ─────────────────
+  function renderScreens() {
+    const container = document.getElementById('features-container')
+    container.innerHTML = features.map((f, i) =>
+      `<div class="feature-screen" id="screen-${i}">
+         <div class="feat-header">
+           <div class="feat-icon-wrap">${f.icon}</div>
+           <div>
+             <h1 class="feat-title">${f.title}</h1>
+             <p class="feat-subtitle">${f.subtitle}</p>
+           </div>
+         </div>
+         <p class="feat-desc">${f.description}</p>
+         <div class="feat-content">${buildContent(f)}</div>
+         <div class="feat-footer">
+           <span class="feat-counter">${f.id} / ${features.length}</span>
+           <div style="display:flex;gap:10px">
+             ${i > 0
+               ? `<button class="btn-next" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-hi);color:var(--muted);box-shadow:none" onclick="showFeature(${i-1})">← Prev</button>`
+               : ''}
+             ${i < features.length - 1
+               ? `<button class="btn-next" onclick="showFeature(${i+1})">Next →</button>`
+               : `<button class="btn-next" onclick="window.location.href='/dashboard'" style="background:linear-gradient(135deg,#10b981,#059669)">🏁 Finish Tour</button>`
+             }
+           </div>
+         </div>
+       </div>`
+    ).join('')
+  }
+
+  // ── Build feature-specific content ────────────
+  function buildContent(f) {
+    switch (f.key) {
+
+      case 'cognitive-profile':
+        return `<div class="metrics-grid">
+          ${f.metrics.map(m => `
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-label">${m.label}</span>
+                <span class="metric-val" style="color:${m.color}">${m.value}</span>
+              </div>
+              <div class="metric-bar-bg">
+                <div class="metric-bar-fill" style="width:${m.value}%;background:${m.color}"></div>
+              </div>
+            </div>`).join('')}
+        </div>`
+
+      case 'twin-chat':
+        return `<div class="chat-wrap">
+          <div class="chat-msgs">
+            ${f.sample.map(msg => `
+              <div class="chat-msg ${msg.role}">
+                <div class="chat-avatar" style="${msg.role==='twin'?'background:var(--gradient)':'background:rgba(255,255,255,0.1);font-size:16px'}">
+                  ${msg.role === 'twin' ? '🧠' : '👤'}
+                </div>
+                <div class="chat-bubble ${msg.role}">${msg.text}</div>
+              </div>`).join('')}
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Ask your twin anything…" id="chat-input" />
+            <button class="chat-send" onclick="sendDemo()">Send</button>
+          </div>
+        </div>`
+
+      case 'visualization':
+        return `<div class="viz-grid">
+          ${f.tags.map((tag, i) => {
+            const icons = ['🕸️','🗺️','📈','📅']
+            return `<div class="viz-card">
+              <div class="viz-icon">${icons[i]||'📊'}</div>
+              <div class="viz-label">${tag}</div>
+              <div class="viz-badge">Coming Soon</div>
+            </div>`
+          }).join('')}
+        </div>`
+
+      case 'decision-shadow':
+        return `<div class="decision-input-wrap">
+          <textarea id="decision-input" placeholder="${f.placeholder}"></textarea>
+          <button class="btn-next" onclick="analyseDecision()" style="width:100%;justify-content:center">
+            🔮 &nbsp;Analyse with Twin
+          </button>
+          <div class="decision-output" id="decision-output"></div>
+        </div>`
+
+      case 'blind-spot':
+        return `<div class="blindspot-list">
+          ${f.blindspots.map(b => `
+            <div class="blindspot-item">
+              <span class="bs-label">${b.label}</span>
+              <span class="bs-badge" style="background:${b.color}22;color:${b.color};border:1px solid ${b.color}44">
+                ${b.level}
+              </span>
+            </div>`).join('')}
+          <div style="margin-top:8px;padding:14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:var(--radius-sm);font-size:13px;color:var(--muted)">
+            💡 <strong style="color:var(--text)">Tip:</strong> Awareness is the first step. Your twin will flag these patterns in future conversations.
+          </div>
+        </div>`
+
+      default: return '<p style="color:var(--muted)">Content loading…</p>'
+    }
+  }
+
+  // ── Show a specific feature ────────────────────
+  function showFeature(idx) {
+    // Hide all screens
+    document.querySelectorAll('.feature-screen').forEach(s => s.classList.remove('active'))
+    document.querySelectorAll('.feature-nav-item').forEach(n => n.classList.remove('active'))
+
+    // Show target
+    const screen = document.getElementById(`screen-${idx}`)
+    const navItem = document.getElementById(`nav-${idx}`)
+    if (screen)  screen.classList.add('active')
+    if (navItem) navItem.classList.add('active')
+
+    currentIdx = idx
+
+    // Animate metric bars
+    setTimeout(() => {
+      document.querySelectorAll('.metric-bar-fill').forEach(bar => {
+        const w = bar.style.width
+        bar.style.width = '0'
+        setTimeout(() => bar.style.width = w, 50)
+      })
+    }, 100)
+  }
+
+  // ── Live chat send (Connected to GitHub Clone Next.js API) ──
+  async function sendDemo() {
+    const inp  = document.getElementById('chat-input')
+    const text = inp.value.trim()
+    if (!text) return
+    const msgs = document.querySelector('.chat-msgs')
+    
+    // 1. Add user message
+    msgs.insertAdjacentHTML('beforeend', `
+      <div class="chat-msg user">
+        <div class="chat-avatar" style="background:rgba(255,255,255,0.1);font-size:16px">👤</div>
+        <div class="chat-bubble user">${text}</div>
+      </div>`)
+    inp.value = ''
+    msgs.scrollTop = msgs.scrollHeight
+
+    // 2. Fetch from Next.js API on port 3000
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          messages: [{ role: 'user', content: text }] 
+        })
+      })
+
+      let reply = ""
+      if (!res.ok) {
+        reply = "Please ensure your Anthropic API Key is added inside the Github backend's .env.local file, and Next.js is running on Port 3000."
+      } else {
+        const data = await res.json()
+        reply = data.response || data.text || data.content || data.message?.content || "No response."
+      }
+
+      // 3. Render Twin message
+      msgs.insertAdjacentHTML('beforeend', `
+        <div class="chat-msg twin">
+          <div class="chat-avatar" style="background:var(--gradient)">🧠</div>
+          <div class="chat-bubble twin">${reply}</div>
+        </div>`)
+      msgs.scrollTop = msgs.scrollHeight
+
+    } catch (err) {
+      msgs.insertAdjacentHTML('beforeend', `
+        <div class="chat-msg twin">
+           <div class="chat-bubble twin" style="color:var(--danger)">Error: Could not reach the Next.js API on localhost:3000. Is it running?</div>
+        </div>`)
+    }
+  }
+
+  // ── Demo decision analysis ──────────────────────
+  function analyseDecision() {
+    const text = document.getElementById('decision-input').value.trim()
+    if (!text || text.length < 10) return
+    const out = document.getElementById('decision-output')
+    out.innerHTML = `<strong>Twin's Analysis:</strong><br/><br/>
+      Based on your cognitive profile — analytical style, data-driven decisions, deep-focus work mode:<br/><br/>
+      <strong>1. Identify the key variables</strong> in this decision. You'll instinctively want to understand the constraints first.<br/>
+      <strong>2. Seek data points</strong> — at least 3 reliable sources before committing.<br/>
+      <strong>3. Watch for anchoring</strong> — your first option will feel "default". Push past it.<br/><br/>
+      <em style="color:var(--dim)">Confidence: 78% match with your decision patterns.</em>`
+    out.classList.add('show')
+  }
+
+  // ── Keyboard nav ──────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' && currentIdx < features.length - 1) showFeature(currentIdx + 1)
+    if (e.key === 'ArrowLeft'  && currentIdx > 0)                   showFeature(currentIdx - 1)
+  })
+
+  // ── Init ──────────────────────────────────────
+  loadFeatures()
+</script>
+</body>
+</html>

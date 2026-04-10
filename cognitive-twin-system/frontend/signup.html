@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — Cognitive Twin System</title>
+  <meta name="description" content="Create your Cognitive Twin account." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="auth-bg">
+  <div class="auth-card">
+
+    <div class="brand">
+      <div class="brand-icon">🧠</div>
+      <span class="brand-name">Cognitive Twin</span>
+      <span class="brand-badge">BETA</span>
+    </div>
+
+    <h1 class="auth-title">Create account</h1>
+    <p class="auth-sub">Build your AI cognitive twin in minutes</p>
+
+    <div id="alert" class="alert"></div>
+
+    <form id="signup-form">
+      <div class="form-group">
+        <label for="name">Full name</label>
+        <input id="name" type="text" placeholder="Yogesh Kumar" required autocomplete="name" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input id="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password <span style="color:var(--dim);font-weight:400">(min 6 chars)</span></label>
+        <input id="password" type="password" placeholder="••••••••" required autocomplete="new-password" minlength="6" />
+      </div>
+      <button id="signup-btn" type="submit" class="btn btn-primary" style="margin-top:8px">
+        Create Account
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a href="/">Sign in</a>
+    </p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  if (getToken()) window.location.href = '/dashboard'
+
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const name     = document.getElementById('name').value.trim()
+    const email    = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value
+
+    if (!name) return showAlert('alert', 'Please enter your name')
+    if (password.length < 6) return showAlert('alert', 'Password must be at least 6 characters')
+
+    setLoading('signup-btn', true, 'Create Account')
+    const { ok, data } = await api('POST', '/auth/signup', { name, email, password })
+    setLoading('signup-btn', false, 'Create Account')
+
+    if (!ok) return showAlert('alert', data.message || 'Signup failed')
+
+    showAlert('alert', 'Account created! Redirecting...', 'success')
+    setToken(data.token)
+    setUser(data.user)
+    setTimeout(() => window.location.href = '/onboarding', 1000)
+  })
+</script>
+</body>
+</html>

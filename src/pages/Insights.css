@@ -1,0 +1,124 @@
+.insights-body {
+  flex: 1;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+/* KPI */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+}
+.kpi-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-info { display: flex; flex-direction: column; }
+.kpi-label { font-size: 11px; color: #6b7280; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.kpi-value { font-size: 24px; font-weight: 900; color: #111827; }
+.kpi-delta { font-size: 11px; font-weight: 700; }
+
+/* UPDATE CALLOUT */
+.update-callout {
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  color: white;
+  padding: 24px 32px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 20px 40px rgba(30, 27, 75, 0.2);
+}
+.callout-icon {
+  width: 56px; height: 56px; background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #fbbf24;
+}
+.callout-content { flex: 1; }
+.callout-content h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.callout-content p { font-size: 14px; opacity: 0.8; line-height: 1.5; }
+.callout-btn {
+  padding: 12px 24px; background: white; color: #1e1b4b; border: none; border-radius: 12px;
+  font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+}
+.callout-btn:hover { background: #f3f4f6; transform: scale(1.05); }
+
+/* CHARTS */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.chart-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.chart-card.wide { grid-column: span 2; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.chart-header h3 { font-size: 16px; font-weight: 800; color: #111827; }
+.history-badge {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+  color: #6b7280; background: #f3f4f6; padding: 4px 10px; border-radius: 20px;
+}
+
+/* BELIEF TIMELINE */
+.belief-timeline {
+  display: flex; flex-direction: column; gap: 24px; padding: 10px 0;
+}
+.timeline-item { position: relative; display: flex; gap: 20px; }
+.timeline-item::before {
+  content: ''; position: absolute; left: 7px; top: 20px; bottom: -24px; width: 2px; background: #f3f4f6;
+}
+.timeline-item:last-child::before { display: none; }
+
+.timeline-marker {
+  width: 16px; height: 16px; background: white; border: 2px solid #e5e7eb; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
+}
+.timeline-marker .inner-dot { width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; }
+
+.timeline-item.drift .timeline-marker { border-color: #f59e0b; }
+.timeline-item.drift .inner-dot { background: #f59e0b; }
+
+.timeline-content { flex: 1; }
+.time-date { font-size: 12px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }
+.time-desc { font-size: 15px; font-weight: 600; color: #1f2937; }
+.drift-label {
+  display: inline-block; margin-top: 6px; padding: 2px 8px; background: #fef3c7; color: #d97706;
+  font-size: 11px; font-weight: 800; border-radius: 6px;
+}
+
+.period-select {
+  border: none; background: #f9fafb; font-size: 13px; font-weight: 700; color: #4b5563;
+  padding: 6px 12px; border-radius: 10px; outline: none; cursor: pointer;
+}
+
+.chart-tooltip {
+  background: white; border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+

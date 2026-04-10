@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Onboarding — Cognitive Twin System</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="onboarding-bg">
+  <div class="onboarding-shell">
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-step active" id="bar-1"></div>
+      <div class="progress-step" id="bar-2"></div>
+      <div class="progress-step" id="bar-3"></div>
+      <div class="progress-step" id="bar-4"></div>
+      <div class="progress-step" id="bar-5"></div>
+      <span class="progress-label" id="progress-label">Step 1 of 5</span>
+    </div>
+
+    <!-- ══ STEP 1 — Welcome ══════════════════════════════════ -->
+    <div class="step-card" id="step-1">
+      <p class="step-number">Step 01</p>
+      <h2 class="step-title">Welcome to your Cognitive setup 🧠</h2>
+      <p class="step-sub">
+        We're about to build a digital model of <em>how you think</em>. This onboarding gathers
+        insights about your reasoning style, personality, and communication patterns.<br/><br/>
+        It only takes 3–4 minutes. Your answers shape your AI twin's behaviour.
+      </p>
+      <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:16px;font-size:13px;color:var(--muted);line-height:1.6">
+        🔒 &nbsp;<strong style="color:var(--text)">Your data is private.</strong>
+        Everything is stored securely and used only to personalise your twin.
+      </div>
+      <div class="step-footer">
+        <button class="btn-next" onclick="goStep(2)">Let's Begin →</button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2 — Opinion Questions ═══════════════════════ -->
+    <div class="step-card" id="step-2" style="display:none">
+      <p class="step-number">Step 02</p>
+      <h2 class="step-title">How do you think? 🤔</h2>
+      <p class="step-sub">Select the option that feels most like you. There's no right answer.</p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <p class="question-label">1. When solving a problem, you usually…</p>
+        <div class="radio-group" data-q="problemSolving">
+          <label class="radio-label"><input type="radio" name="q1" value="analytical"/>
+            <span class="radio-dot"></span> Break it into logical steps, one at a time</label>
+          <label class="radio-label"><input type="radio" name="q1" value="intuitive"/>
+            <span class="radio-dot"></span> Trust your gut and iterate from there</label>
+          <label class="radio-label"><input type="radio" name="q1" value="collaborative"/>
+            <span class="radio-dot"></span> Discuss it with others to find the best path</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <p class="question-label">2. Your preferred learning style is…</p>
+        <div class="radio-group" data-q="learningStyle">
+          <label class="radio-label"><input type="radio" name="q2" value="visual"/>
+            <span class="radio-dot"></span> Visual — diagrams, charts, and videos</label>
+          <label class="radio-label"><input type="radio" name="q2" value="reading"/>
+            <span class="radio-dot"></span> Reading — articles, docs, and books</label>
+          <label class="radio-label"><input type="radio" name="q2" value="hands-on"/>
+            <span class="radio-dot"></span> Hands-on — build it and learn by doing</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <p class="question-label">3. How do you make important decisions?</p>
+        <div class="radio-group" data-q="decisionMaking">
+          <label class="radio-label"><input type="radio" name="q3" value="data-driven"/>
+            <span class="radio-dot"></span> I research thoroughly and go with the data</label>
+          <label class="radio-label"><input type="radio" name="q3" value="instinct"/>
+            <span class="radio-dot"></span> I rely on instinct refined by experience</label>
+          <label class="radio-label"><input type="radio" name="q3" value="hybrid"/>
+            <span class="radio-dot"></span> A mix of analysis and intuition</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <p class="question-label">4. How creative do you consider yourself?</p>
+        <div class="radio-group" data-q="creativityLevel">
+          <label class="radio-label"><input type="radio" name="q4" value="highly"/>
+            <span class="radio-dot"></span> Highly creative — ideas come naturally</label>
+          <label class="radio-label"><input type="radio" name="q4" value="moderate"/>
+            <span class="radio-dot"></span> Moderately creative with structured thinking</label>
+          <label class="radio-label"><input type="radio" name="q4" value="logical"/>
+            <span class="radio-dot"></span> More logical than creative, but I appreciate it</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <p class="question-label">5. Your natural work style is…</p>
+        <div class="radio-group" data-q="workStyle">
+          <label class="radio-label"><input type="radio" name="q5" value="deep-focus"/>
+            <span class="radio-dot"></span> Deep focus blocks — uninterrupted hours</label>
+          <label class="radio-label"><input type="radio" name="q5" value="multitask"/>
+            <span class="radio-dot"></span> Multi-tasking across several things</label>
+          <label class="radio-label"><input type="radio" name="q5" value="collaborative"/>
+            <span class="radio-dot"></span> Best in collaborative team environments</label>
+        </div>
+      </div>
+
+      <div id="alert-2" class="alert"></div>
+      <div class="step-footer space-between">
+        <button class="btn-next" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-hi);color:var(--muted);box-shadow:none" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" id="btn-step2" onclick="submitStep2()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3 — About Me ══════════════════════════════════ -->
+    <div class="step-card" id="step-3" style="display:none">
+      <p class="step-number">Step 03</p>
+      <h2 class="step-title">Tell me about yourself ✍️</h2>
+      <p class="step-sub">Write a short description of who you are — your background, interests, goals, and what drives you. This becomes the core of your twin's personality.</p>
+      <textarea
+        id="about-me"
+        class="step-textarea"
+        placeholder="I'm a final-year computer science student passionate about AI and system design. I enjoy building things that solve real problems and learning through projects. My goal is to become an engineer who bridges research and production..."
+        maxlength="1500"
+      ></textarea>
+      <div style="text-align:right;font-size:12px;color:var(--dim);margin-top:6px">
+        <span id="about-count">0</span>/1500
+      </div>
+      <div id="alert-3" class="alert"></div>
+      <div class="step-footer space-between">
+        <button class="btn-next" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-hi);color:var(--muted);box-shadow:none" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="submitStep3()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 4 — Message Samples ══════════════════════════ -->
+    <div class="step-card" id="step-4" style="display:none">
+      <p class="step-number">Step 04</p>
+      <h2 class="step-title">How do you communicate? 💬</h2>
+      <p class="step-sub">Add 2–5 sample messages or thoughts you'd typically write — in emails, chats, or notes. This teaches your twin your communication style and vocabulary.</p>
+
+      <div class="sample-chips" id="chips"></div>
+      <div class="chip-input-row">
+        <input class="chip-input" id="sample-input" type="text" placeholder="e.g. I prefer async communication..." maxlength="200" />
+        <button class="chip-add" onclick="addChip()">+ Add</button>
+      </div>
+      <p style="font-size:12px;color:var(--dim);margin-top:8px">Press Enter or click Add. Minimum 2 samples.</p>
+
+      <div id="alert-4" class="alert"></div>
+      <div class="step-footer space-between">
+        <button class="btn-next" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-hi);color:var(--muted);box-shadow:none" onclick="goStep(3)">← Back</button>
+        <button class="btn-next" onclick="submitStep4()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 5 — Finish ════════════════════════════════════ -->
+    <div class="step-card" id="step-5" style="display:none">
+      <div class="celebration">
+        <div class="celebration-icon">🎉</div>
+        <h2>Your Twin is Ready!</h2>
+        <p>
+          Your cognitive profile has been built and saved.<br/>
+          Your AI twin now understands your thinking style, communication patterns,
+          and decision-making approach.<br/><br/>
+          Head to the dashboard to explore all 5 features of your Cognitive Twin System.
+        </p>
+        <button class="btn-next" style="width:100%;justify-content:center" onclick="finishOnboarding()">
+          🚀 &nbsp;Go to Dashboard
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /onboarding-bg -->
+
+<script src="script.js"></script>
+<script>
+  if (!requireAuth()) {}
+
+  const TOTAL = 5
+  let chips = []
+
+  // ── Progress bar ─────────────────────────────
+  function updateProgress(step) {
+    for (let i = 1; i <= TOTAL; i++) {
+      const bar = document.getElementById(`bar-${i}`)
+      bar.className = 'progress-step' +
+        (i < step ? ' done' : i === step ? ' active' : '')
+    }
+    document.getElementById('progress-label').textContent = `Step ${step} of ${TOTAL}`
+  }
+
+  // ── Navigate between steps ────────────────────
+  function goStep(step) {
+    document.querySelectorAll('[id^="step-"]').forEach(el => el.style.display = 'none')
+    document.getElementById(`step-${step}`).style.display = 'block'
+    updateProgress(step)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // ── Step 2 — save opinion answers ─────────────
+  async function submitStep2() {
+    const groups = document.querySelectorAll('[data-q]')
+    const answers = {}
+    let allAnswered = true
+
+    groups.forEach(g => {
+      const q   = g.dataset.q
+      const sel = g.querySelector('input[type="radio"]:checked')
+      if (!sel) { allAnswered = false } else { answers[q] = sel.value }
+    })
+
+    if (!allAnswered) return showAlert('alert-2', 'Please answer all 5 questions')
+
+    setLoading('btn-step2', true)
+    await api('POST', '/onboarding', { step: 'step2', data: answers }, true)
+    setLoading('btn-step2', false)
+    goStep(3)
+  }
+
+  // Highlight selected radios
+  document.querySelectorAll('.radio-group').forEach(group => {
+    group.querySelectorAll('.radio-label').forEach(label => {
+      label.addEventListener('click', () => {
+        group.querySelectorAll('.radio-label').forEach(l => l.classList.remove('selected'))
+        label.classList.add('selected')
+      })
+    })
+  })
+
+  // ── Step 3 — about me ─────────────────────────
+  const aboutMe = document.getElementById('about-me')
+  aboutMe.addEventListener('input', () => {
+    document.getElementById('about-count').textContent = aboutMe.value.length
+  })
+
+  async function submitStep3() {
+    const text = aboutMe.value.trim()
+    if (text.length < 30) return showAlert('alert-3', 'Please write at least 30 characters about yourself')
+    await api('POST', '/onboarding', { step: 'step3', data: { aboutMe: text } }, true)
+    goStep(4)
+  }
+
+  // ── Step 4 — message samples ──────────────────
+  function renderChips() {
+    const container = document.getElementById('chips')
+    container.innerHTML = chips.map((c, i) =>
+      `<div class="chip">
+         <span title="${c}">${c}</span>
+         <span class="chip-del" onclick="removeChip(${i})">✕</span>
+       </div>`
+    ).join('')
+  }
+
+  function addChip() {
+    const inp = document.getElementById('sample-input')
+    const val = inp.value.trim()
+    if (!val || chips.length >= 5) return
+    if (chips.includes(val)) { inp.value = ''; return }
+    chips.push(val)
+    inp.value = ''
+    renderChips()
+  }
+
+  function removeChip(idx) {
+    chips.splice(idx, 1)
+    renderChips()
+  }
+
+  document.getElementById('sample-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addChip() }
+  })
+
+  async function submitStep4() {
+    if (chips.length < 2) return showAlert('alert-4', 'Please add at least 2 sample messages')
+    await api('POST', '/onboarding', { step: 'step4', data: { messageSamples: chips } }, true)
+    // Save step5 complete
+    await api('POST', '/onboarding', { step: 'step5', data: { completed: true } }, true)
+    goStep(5)
+  }
+
+  // ── Finish ────────────────────────────────────
+  function finishOnboarding() {
+    const u = getUser()
+    if (u) { u.onboardingCompleted = true; setUser(u) }
+    window.location.href = 'http://localhost:5173'
+  }
+
+  // Auto-save step1 on landing
+  api('POST', '/onboarding', { step: 'step1', data: { welcomed: true } }, true)
+</script>
+</body>
+</html>
