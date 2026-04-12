@@ -117,7 +117,13 @@ export default function Features() {
     setLoading(true);
     setResult('');
     
-    let systemInstruction = "";
+    // Build Deep Neural Background for Features
+    const profileSummary = `Name: ${activeTwin?.name || "User"}. Bio: ${activeTwin?.aboutMe || "N/A"}. Traits: ${JSON.stringify(activeTwin?.answers || {})}`;
+
+    let systemInstruction = `You are a specialized module for the Cognitive Twin of ${activeTwin?.name || "the user"}. 
+    Your responses must be deeply rooted in this neural profile: ${profileSummary}. 
+    `;
+    
     if (featureKey === 'decision-shadow') {
       systemInstruction = "You are the Decision Shadow. Analyze the user's dilemma based on their cognitive twin profile. Provide a precise prediction on how they would reason through it, highlighting the most likely outcome based on their known biases, preferences, and logic patterns. Output with clear headers and bullet points.";
     } else if (featureKey === 'blind-spot') {

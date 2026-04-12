@@ -28,7 +28,7 @@ def patched_load(*args, **kwargs):
     return original_load(*args, **kwargs)
 torch.load = patched_load
 
-print("✔ Neural Shield: ACTIVE (Bypassing Codec & Streamer errors)")
+print("[OK] Neural Shield: ACTIVE (Bypassing Codec & Streamer errors)")
 
 app = Flask(__name__)
 CORS(app)
@@ -58,7 +58,7 @@ print("--- Please wait 1-2 minutes for model loading... ---")
 
 # Standard initialization
 tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=True if device=="cuda" else False).to(device)
-print("\n🚀 NEURAL ENGINE IS FULLY ONLINE & HYBRID-ENABLED!")
+print("\n[INFO] NEURAL ENGINE IS FULLY ONLINE & HYBRID-ENABLED!")
 
 @app.route("/upload_sample", methods=["POST"])
 def upload_sample():
@@ -68,7 +68,7 @@ def upload_sample():
     filename = secure_filename(f"{twin_id}.wav")
     path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(path)
-    print(f"✔ SAVED VOICE RECURRENCE: {path}")
+    print(f"[OK] SAVED VOICE RECURRENCE: {path}")
     return jsonify({"message": "Sample saved", "path": path})
 
 @app.route("/clone", methods=["POST"])
@@ -83,7 +83,7 @@ def clone_and_speak():
     # --- PATH A: Native Edge Neural for South Indian Pack ---
     if language in ["ta", "te", "kn"]:
         try:
-            print(f"🎙 GENERATING NEURAL RESPONSE [Language: {language}]...")
+            print(f"[INFO] GENERATING NEURAL RESPONSE [Language: {language}]...")
             voice_id = EDGE_VOICES.get(language, "en-IN-NeerjaNeural")
             communicate = edge_tts.Communicate(text, voice_id)
             asyncio.run(communicate.save(output_path))
@@ -104,7 +104,7 @@ def clone_and_speak():
         if language in CLONE_LANGS: xtts_lang = language
         elif language == "hi": xtts_lang = "hi"
 
-        print(f"🎙 SYNTHESIZING CLONE [Lang: {xtts_lang}]: '{text[:30]}...'")
+        print(f"[INFO] SYNTHESIZING CLONE [Lang: {xtts_lang}]: '{text[:30]}...'")
         tts.tts_to_file(
             text=text, 
             speaker_wav=speaker_wav, 
@@ -113,7 +113,7 @@ def clone_and_speak():
         )
         return send_file(output_path, mimetype="audio/wav")
     except Exception as e:
-        print(f"❌ Synthesis Error: {e}")
+        print(f"[ERROR] Synthesis Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":

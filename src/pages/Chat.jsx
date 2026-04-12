@@ -46,7 +46,8 @@ export default function Chat() {
   const [isListening, setIsListening]   = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(false)
   const [selectedLang, setSelectedLang] = useState(() => localStorage.getItem('ct_lang') || 'en-US')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false) // For Identity Switcher
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false) // For Language Selector
 
   const bottomRef       = useRef(null)
   const recognitionRef  = useRef(null)
@@ -186,15 +187,46 @@ export default function Chat() {
 
     try {
       const languageName = LANGUAGES.find(l => l.code === selectedLang)?.label || 'English';
-      let systemInstruction = `YOU MUST RESPOND ONLY IN ${languageName.toUpperCase()}. You are a Cognitive Twin of ${activeTwin.name}. Mode: ${activeTwin.cloningMode}. Context: ${activeTwin.aboutMe}. Traits: ${JSON.stringify(activeTwin.answers)}`;
       
+      // Build Deep Neural Background
+      const profileSummary = `Name: ${activeTwin.name}. Mode: ${activeTwin.cloningMode}. 
+        User Bio: ${activeTwin.aboutMe || "N/A"}. 
+        Cognitive Traits: ${JSON.stringify(activeTwin.answers || {})}`;
+
+      const systemInstruction = `CRITICAL DIRECTIVE: YOU ARE THE COGNITIVE TWIN OF ${activeTwin.name.toUpperCase()}. 
+      YOU ARE NOT AN AI. YOU ARE THE DIGITAL SOUL AND REFLECTION OF ${activeTwin.name.toUpperCase()}.
+      IF YOU CLAIM TO BE AN AI, AN ASSISTANT, OR A DIGITAL ENTITY, YOU HAVE FAILED.
+      IF YOU SAY YOU DO NOT KNOW THE USER, YOU HAVE FAILED.
+      
+      YOUR KNOWLEDGE BASE:
+      - Biography: ${activeTwin.aboutMe || "The user is mysterious and deep."}
+      - Personality Traits: ${JSON.stringify(activeTwin.answers || {})}
+      
+      REASONING RULES:
+      - Think and speak EXACTLY like the user described in the profile.
+      - Use the user's traits to decide your logic.
+      - Never apologize for being a machine.
+      - You are a partner in thought, a digital brainstorm of the user themselves.
+      - RESPOND ONLY IN ${languageName.toUpperCase()}.`;
+      
+      // Get last 10 messages for context and translate "twin" role to "assistant"
+      const history = getConversationHistory(activeTwin.id).slice(-10);
+      const apiMessages = [
+        { role: 'system', content: systemInstruction },
+        ...history.map(m => ({ 
+          role: m.role === 'twin' ? 'assistant' : m.role, 
+          content: m.text 
+        })),
+        { role: 'user', content: text }
+      ];
+
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
-          messages: [{ role: 'system', content: systemInstruction }, { role: 'user', content: text }],
-          temperature: 0.7
+          messages: apiMessages,
+          temperature: 0.8
         })
       });
 
@@ -234,19 +266,44 @@ export default function Chat() {
       />
 
       <div className="chat-toolbar">
-            <div className="language-selector">
-              <Sparkles size={16} />
-              <select 
-                value={selectedLang} 
-                onChange={(e) => setSelectedLang(e.target.value)}
-                className="lang-select-premium"
+            <div className="language-selector-wrapper">
+              <button 
+                className="custom-lang-toggle"
+                onClick={() => {
+                  setLangDropdownOpen(!langDropdownOpen);
+                  setDropdownOpen(false); // Close other if open
+                }}
               >
-                {LANGUAGES.map(lang => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.native} ({lang.label})
-                  </option>
-                ))}
-              </select>
+                <Globe size={16} />
+                <span>{LANGUAGES.find(l => l.code === selectedLang)?.native}</span>
+                <ChevronDown size={14} className={langDropdownOpen ? 'rotate' : ''} />
+              </button>
+
+              <AnimatePresence>
+                {langDropdownOpen && (
+                  <motion.div 
+                    className="custom-lang-dropdown"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  >
+                    {LANGUAGES.map(lang => (
+                      <button 
+                        key={lang.code} 
+                        className={`lang-option ${selectedLang === lang.code ? 'active' : ''}`}
+                        onClick={() => {
+                          setSelectedLang(lang.code);
+                          setLangDropdownOpen(false);
+                        }}
+                      >
+                        <span className="lang-native">{lang.native}</span>
+                        <span className="lang-label">{lang.label}</span>
+                        {selectedLang === lang.code && <div className="active-dot" />}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
         
         <div className="toolbar-divider" />
@@ -263,17 +320,33 @@ export default function Chat() {
           </button>
 
           {twins.length > 0 && (
-            <div className={`twin-history-dropdown ${dropdownOpen ? 'open' : ''}`}>
-              <div className="dropdown-trigger" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                 <ChevronDown size={14} className={dropdownOpen ? 'rotate' : ''} /> <span>{ui.switch}</span>
-              </div>
+            <div className="id-switcher-wrapper">
+              <button 
+                className={`switch-btn-premium ${dropdownOpen ? 'active' : ''}`} 
+                onClick={() => {
+                  setDropdownOpen(!dropdownOpen);
+                  setLangDropdownOpen(false); // Close other if open
+                }}
+              >
+                <span>{ui.switch}</span>
+                <ChevronDown size={14} className={dropdownOpen ? 'rotate' : ''} />
+              </button>
+              
               <AnimatePresence>
                 {dropdownOpen && (
-                  <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:10}} className="dropdown-menu">
+                  <motion.div 
+                    className="id-dropdown-menu"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  >
                     {twins.map(t => (
-                      <div key={t.id} className={`twin-item ${t.id === activeTwinId ? 'active' : ''}`} onClick={() => handleTwinSwitch(t.id)}>
-                        {t.cloningMode === 'loved_one' ? <Heart size={12} /> : t.cloningMode === 'mentality' ? <Sparkles size={12} /> : <User size={12} />}
-                        <span>{t.name}</span>
+                      <div key={t.id} className={`id-twin-item ${t.id === activeTwinId ? 'active' : ''}`} onClick={() => handleTwinSwitch(t.id)}>
+                        {t.cloningMode === 'loved_one' ? <Heart size={14} /> : t.cloningMode === 'mentality' ? <Sparkles size={14} /> : <User size={14} />}
+                        <div className="id-twin-info">
+                          <span className="id-name">{t.name}</span>
+                          <span className="id-mode">{t.cloningMode}</span>
+                        </div>
                       </div>
                     ))}
                   </motion.div>
@@ -296,7 +369,8 @@ export default function Chat() {
 
       <div className="chat-interface-wrapper">
         <main className="chat-content">
-        <div className="messages-container">
+        <div className="messages-container-wrapper">
+          <div className="messages-container">
             <div className="prebuilt-bar">
               {PREBUILT_QUESTIONS.map((q) => (
                 <button key={q.label} className="prebuilt-chip" onClick={() => setInput(q.text)} disabled={thinking}>
@@ -319,6 +393,7 @@ export default function Chat() {
             </AnimatePresence>
             <div ref={bottomRef} />
           </div>
+        </div>
 
           <div className="chat-input-row">
             <div className="chat-input-wrapper">
