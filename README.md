@@ -73,4 +73,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 This project is at the frontier of digital identity. Contributions that enhance cognitive memory, knowledge graphs, or neural agency are welcome.
 
-**Crafted with 🧠 by [Yogesh Mohan](https://github.com/iamYogeshMohan)**
+**Crafted with 🧠 by [Yogesh Mohan](https://github.com/iamYogeshMohan), Prajwal N, Mohammed Sameewullah, Nivethitha R**
